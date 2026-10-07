@@ -1,193 +1,136 @@
 "use client";
 
 import { useState } from "react";
-import { Terminal, Copy, Check, Code2, Layers, Cpu, ShieldCheck } from "lucide-react";
+import { Copy, Check, Code2, Layers, Cpu, ShieldCheck } from "lucide-react";
 
 export default function InteractivePlayground() {
-  const [activeTab, setActiveTab] = useState<"ts" | "python" | "architecture">("ts");
   const [copied, setCopied] = useState(false);
 
-  const snippets = {
-    ts: `import { KavyaSwarm, Agent } from "@kavya-labs/sdk";
+  const codeSnippet = `import { KavyaSwarm } from "@kavya-labs/sdk";
 
-// Initialize Kavya enterprise orchestrator
+// 1. Initialize enterprise orchestrator
 const swarm = new KavyaSwarm({
   apiKey: process.env.KAVYA_API_KEY,
   cluster: "in-south-1",
   guardrails: { zeroHallucination: true, strictSchema: true }
 });
 
-// Configure specialized agents
-const retriever = swarm.agent({ role: "context-indexer", vectorStore: "vpc-qdrant" });
-const analyst = swarm.agent({ role: "statutory-auditor", model: "claude-3-7-sonnet" });
-
-// Dispatch mission with consensus verification
-const execution = await swarm.execute({
+// 2. Dispatch mission with consensus verification
+const result = await swarm.execute({
   mission: "Reconcile corporate invoices & produce compliance verification",
-  agents: [retriever, analyst],
-  timeoutMs: 2000
+  agents: ["retriever", "auditor"],
+  timeoutMs: 1500
 });
 
-console.log("Execution verified in:", execution.latencyMs, "ms");
-console.log(execution.report);`,
-
-    python: `from kavya import Swarm, Agent, Guardrails
-
-# Connect to private enterprise cluster
-client = Swarm(
-    api_key="kavya_prod_live_key",
-    endpoint="https://ai-gateway.internal.corp",
-    guardrails=Guardrails(zero_hallucination=True, pii_masking=True)
-)
-
-# Register task agents
-indexer = client.create_agent(name="SchemaIndexer", tools=["sql_catalog", "docs_vector"])
-synthesizer = client.create_agent(name="DecisionEngine", model="gpt-4o")
-
-# Run autonomous mission pipeline
-pipeline = client.dispatch_pipeline(
-    task="Scan 20,000 ledger transactions for tax variance discrepancies",
-    agents=[indexer, synthesizer],
-    require_consensus=True
-)
-
-for trace in pipeline.stream_traces():
-    print(f"[{trace.agent}] {trace.action} -> {trace.status}")
-
-final_report = pipeline.get_result()
-print("Cryptographic Audit Hash:", final_report.audit_hash)`,
-  };
+console.log("Decision verified in:", result.latencyMs, "ms");`;
 
   const handleCopy = () => {
-    const textToCopy = activeTab === "ts" ? snippets.ts : snippets.python;
-    navigator.clipboard.writeText(textToCopy);
+    navigator.clipboard.writeText(codeSnippet);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
 
   return (
-    <section id="architecture" className="py-24 bg-slate-50 relative overflow-hidden">
+    <section id="architecture" className="py-16 sm:py-24 bg-slate-50 relative overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="text-center max-w-3xl mx-auto mb-16">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-slate-200 text-xs font-semibold text-slate-700 shadow-2xs mb-4">
+        <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-16">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-slate-200 text-xs font-semibold text-slate-700 shadow-2xs mb-3 sm:mb-4">
             <Code2 className="w-3.5 h-3.5 text-slate-600" />
-            <span>Developer Experience</span>
+            <span>Developer Architecture</span>
           </div>
-          <h2 className="text-3xl sm:text-5xl font-extrabold text-slate-950 tracking-tight">
+          <h2 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-slate-950 tracking-tight">
             Developer-First SDKs Built for Simplicity
           </h2>
-          <p className="mt-4 text-base sm:text-lg text-slate-600">
-            Integrate autonomous swarms into existing codebases in fewer than 20 lines of code.
-            End-to-end type safety, async streaming, and enterprise guardrails standard.
+          <p className="mt-3 sm:mt-4 text-sm sm:text-base lg:text-lg text-slate-600">
+            Integrate autonomous swarms into existing production systems in fewer than 15 lines of code.
           </p>
         </div>
 
-        {/* Code & Architecture Showcase */}
-        <div className="max-w-4xl mx-auto rounded-2xl bg-slate-900 border border-slate-800 shadow-xl overflow-hidden">
-          {/* Top Bar */}
-          <div className="flex flex-wrap items-center justify-between gap-4 px-6 py-4 bg-slate-950/80 border-b border-slate-800">
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => setActiveTab("ts")}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                  activeTab === "ts"
-                    ? "bg-slate-800 text-white shadow-2xs"
-                    : "text-slate-400 hover:text-slate-200"
-                }`}
-              >
-                TypeScript / Node.js
-              </button>
-              <button
-                onClick={() => setActiveTab("python")}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                  activeTab === "python"
-                    ? "bg-slate-800 text-white shadow-2xs"
-                    : "text-slate-400 hover:text-slate-200"
-                }`}
-              >
-                Python SDK
-              </button>
-              <button
-                onClick={() => setActiveTab("architecture")}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                  activeTab === "architecture"
-                    ? "bg-slate-800 text-white shadow-2xs"
-                    : "text-slate-400 hover:text-slate-200"
-                }`}
-              >
-                Distributed Topology
-              </button>
-            </div>
+        {/* Static Workflow Diagram + Clean Static Code Block */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start max-w-6xl mx-auto">
+          {/* Static Workflow Diagram */}
+          <div className="lg:col-span-5 space-y-4">
+            <h3 className="text-sm font-bold uppercase tracking-wider text-slate-500 font-mono">
+              Execution Architecture
+            </h3>
 
-            {activeTab !== "architecture" && (
-              <button
-                onClick={handleCopy}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-300 transition-colors border border-slate-700"
-              >
-                {copied ? (
-                  <>
-                    <Check className="w-3.5 h-3.5 text-lime-400" />
-                    <span className="text-lime-400">Copied</span>
-                  </>
-                ) : (
-                  <>
-                    <Copy className="w-3.5 h-3.5" />
-                    <span>Copy Snippet</span>
-                  </>
-                )}
-              </button>
-            )}
-          </div>
-
-          {/* Content */}
-          <div className="p-6">
-            {activeTab === "architecture" ? (
-              <div className="py-6 space-y-6">
-                <div className="text-center max-w-md mx-auto">
-                  <h4 className="text-white font-bold text-base">Hierarchical Distributed Swarm Runtime</h4>
-                  <p className="text-xs text-slate-400 mt-1">
-                    Multi-tier coordination separating intent parsing, parallel execution, and deterministic validation.
+            <div className="space-y-3">
+              <div className="p-4 sm:p-5 rounded-xl bg-white border border-slate-200 shadow-2xs flex items-start gap-3.5">
+                <div className="w-9 h-9 rounded-lg bg-slate-100 border border-slate-200 text-slate-800 flex items-center justify-center shrink-0">
+                  <Layers className="w-4 h-4" />
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold text-slate-900">1. Coordinator Agent</h4>
+                  <p className="text-xs text-slate-600 mt-0.5 leading-relaxed">
+                    Deconstructs business tasks into dependency graphs and coordinates worker sub-agents.
                   </p>
                 </div>
+              </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="p-5 rounded-xl bg-slate-800/80 border border-slate-700 text-center space-y-2">
-                    <div className="w-9 h-9 mx-auto rounded-lg bg-slate-700 text-slate-200 flex items-center justify-center">
-                      <Layers className="w-4 h-4" />
-                    </div>
-                    <h5 className="font-semibold text-white text-xs sm:text-sm">1. Coordinator Node</h5>
-                    <p className="text-xs text-slate-400">
-                      Parses business intent, constructs DAG dependencies, and assigns agent privileges.
-                    </p>
-                  </div>
-
-                  <div className="p-5 rounded-xl bg-slate-800/80 border border-slate-700 text-center space-y-2">
-                    <div className="w-9 h-9 mx-auto rounded-lg bg-slate-700 text-slate-200 flex items-center justify-center">
-                      <Cpu className="w-4 h-4" />
-                    </div>
-                    <h5 className="font-semibold text-white text-xs sm:text-sm">2. Neural Execution Agents</h5>
-                    <p className="text-xs text-slate-400">
-                      Parallel workers querying private vector stores, databases, and tool environments.
-                    </p>
-                  </div>
-
-                  <div className="p-5 rounded-xl bg-slate-800/80 border border-slate-700 text-center space-y-2">
-                    <div className="w-9 h-9 mx-auto rounded-lg bg-slate-700 text-lime-400 flex items-center justify-center">
-                      <ShieldCheck className="w-4 h-4" />
-                    </div>
-                    <h5 className="font-semibold text-white text-xs sm:text-sm">3. Guardrail Consensus</h5>
-                    <p className="text-xs text-slate-400">
-                      Cross-agent consistency checks, PII scrubbing, and cryptographic audit locking.
-                    </p>
-                  </div>
+              <div className="p-4 sm:p-5 rounded-xl bg-white border border-slate-200 shadow-2xs flex items-start gap-3.5">
+                <div className="w-9 h-9 rounded-lg bg-slate-100 border border-slate-200 text-slate-800 flex items-center justify-center shrink-0">
+                  <Cpu className="w-4 h-4" />
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold text-slate-900">2. Neural Execution Agents</h4>
+                  <p className="text-xs text-slate-600 mt-0.5 leading-relaxed">
+                    Queries private vector databases, external ERP APIs, and sandboxes concurrently.
+                  </p>
                 </div>
               </div>
-            ) : (
-              <pre className="font-mono text-xs sm:text-sm text-slate-200 overflow-x-auto leading-relaxed">
-                <code>{snippets[activeTab]}</code>
-              </pre>
-            )}
+
+              <div className="p-4 sm:p-5 rounded-xl bg-white border border-slate-200 shadow-2xs flex items-start gap-3.5">
+                <div className="w-9 h-9 rounded-lg bg-slate-100 border border-slate-200 text-lime-700 flex items-center justify-center shrink-0">
+                  <ShieldCheck className="w-4 h-4" />
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold text-slate-900">3. Deterministic Consensus</h4>
+                  <p className="text-xs text-slate-600 mt-0.5 leading-relaxed">
+                    Cross-validates answers, scrubs PII, and seals output with cryptographic audit hashes.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Static Code Snippet Block */}
+          <div className="lg:col-span-7">
+            <div className="rounded-2xl bg-slate-900 border border-slate-800 shadow-xl overflow-hidden">
+              <div className="flex items-center justify-between px-4 sm:px-6 py-3.5 bg-slate-950/90 border-b border-slate-800">
+                <div className="flex items-center gap-2">
+                  <span className="w-2.5 h-2.5 rounded-full bg-slate-700 inline-block" />
+                  <span className="w-2.5 h-2.5 rounded-full bg-slate-700 inline-block" />
+                  <span className="w-2.5 h-2.5 rounded-full bg-slate-700 inline-block" />
+                  <span className="text-xs font-mono text-slate-400 font-medium ml-2">
+                    quickstart.ts
+                  </span>
+                </div>
+
+                <button
+                  onClick={handleCopy}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-300 transition-colors border border-slate-700 cursor-pointer"
+                >
+                  {copied ? (
+                    <>
+                      <Check className="w-3.5 h-3.5 text-lime-400" />
+                      <span className="text-lime-400">Copied</span>
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-3.5 h-3.5" />
+                      <span>Copy</span>
+                    </>
+                  )}
+                </button>
+              </div>
+
+              <div className="p-4 sm:p-6 overflow-x-auto">
+                <pre className="font-mono text-xs sm:text-sm text-slate-200 leading-relaxed">
+                  <code>{codeSnippet}</code>
+                </pre>
+              </div>
+            </div>
           </div>
         </div>
       </div>

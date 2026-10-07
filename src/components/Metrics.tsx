@@ -31,13 +31,13 @@ export default function Metrics() {
   ];
 
   return (
-    <section id="benchmarks" className="py-20 bg-white border-b border-slate-200/80">
+    <section id="benchmarks" className="py-14 sm:py-20 bg-white border-b border-slate-200/80">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
           {benchmarks.map((item, idx) => (
             <div
               key={idx}
-              className="p-6 rounded-2xl bg-slate-50/70 border border-slate-200/80 hover:border-slate-300 transition-all hover:shadow-sm"
+              className="p-5 sm:p-6 rounded-2xl bg-slate-50/70 border border-slate-200/80 hover:border-slate-300 transition-all hover:shadow-sm"
             >
               <div className="flex items-center justify-between mb-4">
                 <span className="p-2 rounded-lg bg-white border border-slate-200 shadow-2xs">

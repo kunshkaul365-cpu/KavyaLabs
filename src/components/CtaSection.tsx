@@ -15,44 +15,44 @@ export default function CtaSection() {
   };
 
   return (
-    <section id="contact" className="py-24 bg-white relative overflow-hidden">
+    <section id="contact" className="py-16 sm:py-24 bg-white relative overflow-hidden">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="rounded-3xl p-8 sm:p-14 bg-slate-900 text-white shadow-xl text-center space-y-8">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-slate-800 text-xs font-medium text-slate-300 border border-slate-700">
+        <div className="rounded-3xl p-6 sm:p-10 md:p-14 bg-slate-900 text-white shadow-xl text-center space-y-6 sm:space-y-8">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-800 text-xs font-medium text-slate-300 border border-slate-700">
             <span className="w-2 h-2 rounded-full bg-lime-400" />
             <span>Enterprise Preview</span>
           </div>
 
-          <h2 className="text-3xl sm:text-5xl font-extrabold text-white tracking-tight max-w-2xl mx-auto leading-tight">
+          <h2 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight max-w-2xl mx-auto leading-tight">
             Accelerate Your Enterprise AI Roadmap Today
           </h2>
 
-          <p className="text-slate-300 max-w-xl mx-auto text-base sm:text-lg leading-relaxed">
+          <p className="text-slate-300 max-w-xl mx-auto text-sm sm:text-base lg:text-lg leading-relaxed">
             Get access to the Kavya Labs SDK, private sandboxes, and dedicated enterprise support.
           </p>
 
           {submitted ? (
-            <div className="max-w-md mx-auto p-6 rounded-2xl bg-slate-800/90 border border-slate-700 text-slate-200 space-y-2">
+            <div className="max-w-md mx-auto p-5 sm:p-6 rounded-2xl bg-slate-800/90 border border-slate-700 text-slate-200 space-y-2">
               <CheckCircle2 className="w-8 h-8 mx-auto text-lime-400" />
-              <h4 className="font-bold text-lg text-white">Access Request Received</h4>
+              <h4 className="font-bold text-base sm:text-lg text-white">Access Request Received</h4>
               <p className="text-xs text-slate-300">
                 A verification link and trial credentials have been sent to{" "}
                 <strong className="text-lime-300">{email}</strong>.
               </p>
             </div>
           ) : (
-            <form onSubmit={handleSubmit} className="max-w-md mx-auto flex flex-col sm:flex-row gap-3">
+            <form onSubmit={handleSubmit} className="max-w-md mx-auto flex flex-col sm:flex-row gap-3 w-full">
               <input
                 type="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter your corporate email..."
-                className="flex-1 px-5 py-3.5 rounded-xl bg-slate-800 border border-slate-700 text-white placeholder-slate-400 text-sm focus:outline-none focus:border-slate-500 focus:ring-1 focus:ring-slate-500 transition-all"
+                className="flex-1 px-4 sm:px-5 py-3 sm:py-3.5 rounded-xl bg-slate-800 border border-slate-700 text-white placeholder-slate-400 text-sm focus:outline-none focus:border-slate-500 focus:ring-1 focus:ring-slate-500 transition-all"
               />
               <button
                 type="submit"
-                className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl text-sm font-semibold text-slate-950 bg-white hover:bg-slate-100 shadow-sm transition-all shrink-0"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 sm:py-3.5 rounded-xl text-sm font-semibold text-slate-950 bg-white hover:bg-slate-100 shadow-sm transition-all shrink-0 cursor-pointer"
               >
                 <span>Request Access</span>
                 <ArrowRight className="w-4 h-4" />

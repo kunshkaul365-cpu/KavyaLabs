@@ -28,14 +28,14 @@ export default function Testimonials() {
   ];
 
   return (
-    <section className="py-24 bg-slate-50 border-b border-slate-200/80">
+    <section className="py-16 sm:py-24 bg-slate-50 border-b border-slate-200/80">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center max-w-2xl mx-auto mb-16">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-slate-200 text-xs font-semibold text-slate-700 shadow-2xs mb-4">
+        <div className="text-center max-w-2xl mx-auto mb-12 sm:mb-16">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-slate-200 text-xs font-semibold text-slate-700 shadow-2xs mb-3 sm:mb-4">
             <MessageSquare className="w-3.5 h-3.5 text-slate-600" />
             <span>Enterprise Feedback</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-950 tracking-tight">
+          <h2 className="text-2xl sm:text-4xl font-extrabold text-slate-950 tracking-tight">
             Trusted by Engineering Leaders Worldwide
           </h2>
           <p className="mt-3 text-sm sm:text-base text-slate-600">
@@ -43,11 +43,11 @@ export default function Testimonials() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
           {testimonials.map((t, idx) => (
             <div
               key={idx}
-              className="p-8 rounded-2xl bg-white border border-slate-200/90 shadow-2xs hover:shadow-md transition-all flex flex-col justify-between"
+              className="p-6 sm:p-8 rounded-2xl bg-white border border-slate-200/90 shadow-2xs hover:shadow-md transition-all flex flex-col justify-between"
             >
               <div className="space-y-4">
                 <div className="flex items-center gap-1 text-slate-900">

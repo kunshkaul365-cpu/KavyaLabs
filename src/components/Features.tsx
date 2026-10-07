@@ -64,29 +64,29 @@ export default function Features() {
   ];
 
   return (
-    <section id="capabilities" className="py-24 bg-white border-y border-slate-200/80">
+    <section id="capabilities" className="py-16 sm:py-24 bg-white border-y border-slate-200/80">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto mb-16">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 border border-slate-200 text-xs font-semibold text-slate-700 mb-4">
+        <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-16">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 border border-slate-200 text-xs font-semibold text-slate-700 mb-3 sm:mb-4">
             <Layers className="w-3.5 h-3.5 text-slate-600" />
             <span>Platform Capabilities</span>
           </div>
-          <h2 className="text-3xl sm:text-5xl font-extrabold text-slate-950 tracking-tight">
+          <h2 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-slate-950 tracking-tight">
             Engineered for Verifiable Precision &amp; Enterprise Scale
           </h2>
-          <p className="mt-4 text-base sm:text-lg text-slate-600 leading-relaxed">
+          <p className="mt-3 sm:mt-4 text-sm sm:text-base lg:text-lg text-slate-600 leading-relaxed">
             Every component of Kavya Labs is architected to transition probabilistic model outputs
             into deterministic, production-grade business processes.
           </p>
         </div>
 
         {/* Capabilities Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
           {capabilities.map((item, idx) => (
             <div
               key={idx}
-              className="group relative rounded-2xl bg-slate-50/70 border border-slate-200/90 p-8 hover:bg-white hover:border-slate-300 transition-all duration-200 hover:shadow-lg flex flex-col justify-between"
+              className="group relative rounded-2xl bg-slate-50/70 border border-slate-200/90 p-6 sm:p-8 hover:bg-white hover:border-slate-300 transition-all duration-200 hover:shadow-lg flex flex-col justify-between"
             >
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
