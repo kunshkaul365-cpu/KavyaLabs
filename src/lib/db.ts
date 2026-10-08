@@ -8,15 +8,16 @@ export interface UserRecord {
   email: string;
   passwordHash: string;
   role: "admin" | "developer" | "member";
+  status: "active" | "invited" | "suspended";
   image?: string;
   createdAt: string;
+  lastLogin?: string;
 }
 
 // In-memory fallback and cache for serverless environments
 let inMemoryUsers: UserRecord[] | null = null;
 
 function getDbFilePath(): string {
-  // On Vercel serverless functions, /tmp is the only writable directory
   if (process.env.VERCEL) {
     return path.join("/tmp", "kavya_users.json");
   }
@@ -32,30 +33,60 @@ function getDbFilePath(): string {
 }
 
 function getInitialSeedUsers(): UserRecord[] {
-  // Pre-hashed passwords using bcrypt (10 rounds)
-  // "devPassword123" -> $2a$10$7Z2N2xK8i4I4Y0bW5Xb5/.Z7HkWgEwXzH2Z9tS3v4d8K7t2m1g4qW
-  // "adminPassword123" -> $2a$10$9p0w1e2r3t4y5u6i7o8p9u.Z7HkWgEwXzH2Z9tS3v4d8K7t2m1g4qW
   const devHash = bcrypt.hashSync("devPassword123", 10);
   const adminHash = bcrypt.hashSync("adminPassword123", 10);
 
   return [
     {
-      id: "usr_seed_dev_01",
-      name: "Alex Dev",
-      email: "developer@kavyalabs.com",
-      passwordHash: devHash,
-      role: "developer",
-      image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=256&q=80",
-      createdAt: new Date().toISOString(),
-    },
-    {
-      id: "usr_seed_admin_02",
+      id: "usr_seed_admin_01",
       name: "Rohan Admin",
       email: "admin@kavyalabs.com",
       passwordHash: adminHash,
       role: "admin",
+      status: "active",
       image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=256&q=80",
-      createdAt: new Date().toISOString(),
+      createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 7).toISOString(),
+      lastLogin: new Date().toISOString(),
+    },
+    {
+      id: "usr_seed_dev_02",
+      name: "Alex Dev",
+      email: "developer@kavyalabs.com",
+      passwordHash: devHash,
+      role: "developer",
+      status: "active",
+      image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=256&q=80",
+      createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 5).toISOString(),
+      lastLogin: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
+    },
+    {
+      id: "usr_seed_member_03",
+      name: "Priya Sharma",
+      email: "priya@aetherdynamics.com",
+      passwordHash: bcrypt.hashSync("memberPass123", 10),
+      role: "member",
+      status: "active",
+      createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 3).toISOString(),
+      lastLogin: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(),
+    },
+    {
+      id: "usr_seed_dev_04",
+      name: "Vikram Nambiar",
+      email: "vikram@hypercloud.io",
+      passwordHash: bcrypt.hashSync("memberPass123", 10),
+      role: "developer",
+      status: "active",
+      createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2).toISOString(),
+      lastLogin: new Date(Date.now() - 1000 * 60 * 60 * 6).toISOString(),
+    },
+    {
+      id: "usr_seed_member_05",
+      name: "Neha Gupta",
+      email: "neha.gupta@enterprise.in",
+      passwordHash: bcrypt.hashSync("memberPass123", 10),
+      role: "member",
+      status: "invited",
+      createdAt: new Date(Date.now() - 1000 * 60 * 60 * 12).toISOString(),
     },
   ];
 }
@@ -70,13 +101,14 @@ function loadUsers(): UserRecord[] {
     if (fs.existsSync(filePath)) {
       const data = fs.readFileSync(filePath, "utf-8");
       inMemoryUsers = JSON.parse(data);
-      return inMemoryUsers || [];
+      if (inMemoryUsers && inMemoryUsers.length > 0) {
+        return inMemoryUsers;
+      }
     }
   } catch (err) {
     console.error("Failed to read users from disk, using seed users:", err);
   }
 
-  // Initialize with seed users if file does not exist
   inMemoryUsers = getInitialSeedUsers();
   saveUsers(inMemoryUsers);
   return inMemoryUsers;
@@ -114,6 +146,7 @@ export async function createUser(data: {
   email: string;
   passwordHash: string;
   role?: "admin" | "developer" | "member";
+  status?: "active" | "invited" | "suspended";
 }): Promise<UserRecord> {
   const users = loadUsers();
   const normalizedEmail = data.email.trim().toLowerCase();
@@ -129,10 +162,41 @@ export async function createUser(data: {
     email: normalizedEmail,
     passwordHash: data.passwordHash,
     role: data.role || "member",
+    status: data.status || "active",
     createdAt: new Date().toISOString(),
+    lastLogin: new Date().toISOString(),
   };
 
   users.push(newUser);
   saveUsers(users);
   return newUser;
+}
+
+export async function updateUser(
+  id: string,
+  updates: Partial<Omit<UserRecord, "id" | "email" | "createdAt">>
+): Promise<UserRecord | null> {
+  const users = loadUsers();
+  const index = users.findIndex((u) => u.id === id);
+  if (index === -1) return null;
+
+  users[index] = {
+    ...users[index],
+    ...updates,
+  };
+
+  saveUsers(users);
+  return users[index];
+}
+
+export async function deleteUser(id: string): Promise<boolean> {
+  const users = loadUsers();
+  const initialLength = users.length;
+  const filtered = users.filter((u) => u.id !== id);
+
+  if (filtered.length !== initialLength) {
+    saveUsers(filtered);
+    return true;
+  }
+  return false;
 }
