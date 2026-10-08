@@ -14,23 +14,38 @@ export interface UserRecord {
   lastLogin?: string;
 }
 
+export interface TaskRecord {
+  id: string;
+  title: string;
+  description?: string;
+  status: "pending" | "in_progress" | "completed";
+  priority: "low" | "medium" | "high";
+  createdAt: string;
+  completedAt?: string;
+}
+
 // In-memory fallback and cache for serverless environments
 let inMemoryUsers: UserRecord[] | null = null;
+let inMemoryTasks: TaskRecord[] | null = null;
 
-function getDbFilePath(): string {
+function getDbFilePath(filename: string): string {
   if (process.env.VERCEL) {
-    return path.join("/tmp", "kavya_users.json");
+    return path.join("/tmp", filename);
   }
   const localDir = path.join(process.cwd(), "data");
   if (!fs.existsSync(localDir)) {
     try {
       fs.mkdirSync(localDir, { recursive: true });
     } catch {
-      return path.join("/tmp", "kavya_users.json");
+      return path.join("/tmp", filename);
     }
   }
-  return path.join(localDir, "users.json");
+  return path.join(localDir, filename);
 }
+
+// ==========================================
+// USER DATABASE METHODS
+// ==========================================
 
 function getInitialSeedUsers(): UserRecord[] {
   const devHash = bcrypt.hashSync("devPassword123", 10);
@@ -96,7 +111,7 @@ function loadUsers(): UserRecord[] {
     return inMemoryUsers;
   }
 
-  const filePath = getDbFilePath();
+  const filePath = getDbFilePath("users.json");
   try {
     if (fs.existsSync(filePath)) {
       const data = fs.readFileSync(filePath, "utf-8");
@@ -116,7 +131,7 @@ function loadUsers(): UserRecord[] {
 
 function saveUsers(users: UserRecord[]): void {
   inMemoryUsers = users;
-  const filePath = getDbFilePath();
+  const filePath = getDbFilePath("users.json");
   try {
     fs.writeFileSync(filePath, JSON.stringify(users, null, 2), "utf-8");
   } catch (err) {
@@ -196,6 +211,141 @@ export async function deleteUser(id: string): Promise<boolean> {
 
   if (filtered.length !== initialLength) {
     saveUsers(filtered);
+    return true;
+  }
+  return false;
+}
+
+// ==========================================
+// TASK DATABASE METHODS (Survives page refresh)
+// ==========================================
+
+function getInitialSeedTasks(): TaskRecord[] {
+  return [
+    {
+      id: "task_1",
+      title: "Deploy Q3 RBI & IFRS Regulatory Audit Swarm",
+      description: "Automated scan of 45,000 ledger transactions with cryptographic verification.",
+      status: "completed",
+      priority: "high",
+      createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(),
+      completedAt: new Date(Date.now() - 1000 * 60 * 60 * 18).toISOString(),
+    },
+    {
+      id: "task_2",
+      title: "Integrate Qdrant Vector DB with Private Bangalore VPC",
+      description: "Sub-25ms semantic document indexing over confidential enterprise PDFs.",
+      status: "completed",
+      priority: "medium",
+      createdAt: new Date(Date.now() - 1000 * 60 * 60 * 16).toISOString(),
+      completedAt: new Date(Date.now() - 1000 * 60 * 60 * 4).toISOString(),
+    },
+    {
+      id: "task_3",
+      title: "Configure PII Sanitization Guardrail Filter",
+      description: "Ensure regex & neural scrubbing of Aadhaar, PAN and credit card numbers.",
+      status: "pending",
+      priority: "high",
+      createdAt: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(),
+    },
+    {
+      id: "task_4",
+      title: "Run Concurrency Load Test on Coordinator Node",
+      description: "Verify atomic mutex backoff locks under 15,000 synthetic requests.",
+      status: "pending",
+      priority: "medium",
+      createdAt: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
+    },
+  ];
+}
+
+function loadTasks(): TaskRecord[] {
+  if (inMemoryTasks !== null) {
+    return inMemoryTasks;
+  }
+
+  const filePath = getDbFilePath("tasks.json");
+  try {
+    if (fs.existsSync(filePath)) {
+      const data = fs.readFileSync(filePath, "utf-8");
+      inMemoryTasks = JSON.parse(data);
+      if (inMemoryTasks && Array.isArray(inMemoryTasks)) {
+        return inMemoryTasks;
+      }
+    }
+  } catch (err) {
+    console.error("Failed to read tasks from disk, using seed tasks:", err);
+  }
+
+  inMemoryTasks = getInitialSeedTasks();
+  saveTasks(inMemoryTasks);
+  return inMemoryTasks;
+}
+
+function saveTasks(tasks: TaskRecord[]): void {
+  inMemoryTasks = tasks;
+  const filePath = getDbFilePath("tasks.json");
+  try {
+    fs.writeFileSync(filePath, JSON.stringify(tasks, null, 2), "utf-8");
+  } catch (err) {
+    console.error("Failed to persist tasks to disk:", err);
+  }
+}
+
+export async function getAllTasks(): Promise<TaskRecord[]> {
+  return loadTasks();
+}
+
+export async function createTask(data: {
+  title: string;
+  description?: string;
+  priority?: "low" | "medium" | "high";
+  status?: "pending" | "in_progress" | "completed";
+}): Promise<TaskRecord> {
+  const tasks = loadTasks();
+
+  const newTask: TaskRecord = {
+    id: `task_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
+    title: data.title.trim(),
+    description: data.description?.trim() || "",
+    status: data.status || "pending",
+    priority: data.priority || "medium",
+    createdAt: new Date().toISOString(),
+  };
+
+  tasks.unshift(newTask); // newest first
+  saveTasks(tasks);
+  return newTask;
+}
+
+export async function updateTask(
+  id: string,
+  updates: Partial<Omit<TaskRecord, "id" | "createdAt">>
+): Promise<TaskRecord | null> {
+  const tasks = loadTasks();
+  const index = tasks.findIndex((t) => t.id === id);
+  if (index === -1) return null;
+
+  const current = tasks[index];
+  const updatedStatus = updates.status !== undefined ? updates.status : current.status;
+  
+  tasks[index] = {
+    ...current,
+    ...updates,
+    completedAt: updatedStatus === "completed" ? (current.completedAt || new Date().toISOString()) : undefined,
+  };
+
+  saveTasks(tasks);
+  return tasks[index];
+}
+
+export async function deleteTask(id: string): Promise<boolean> {
+  const tasks = loadTasks();
+  const initialLength = tasks.length;
+  const filtered = tasks.filter((t) => t.id !== id);
+
+  if (filtered.length !== initialLength) {
+    saveTasks(filtered);
     return true;
   }
   return false;
