@@ -17,13 +17,21 @@ export const metadata: Metadata = {
   description: "Enterprise AI Agent orchestration platform engineered in Bengaluru. Build, verify, and deploy autonomous multi-agent systems with sub-second latency.",
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+import Providers from "@/components/Providers";
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        <Providers>{children}</Providers>
+      </body>
     </html>
   );
 }
