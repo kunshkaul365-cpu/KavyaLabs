@@ -33,11 +33,17 @@ export default function LoginPage() {
       setLoading(true);
       setError(null);
       const res = await signIn("credentials", {
-        email,
-        password: password || "password123",
-        callbackUrl: "/dashboard",
-        redirect: true,
+        email: email.trim().toLowerCase(),
+        password: password,
+        redirect: false,
       });
+
+      if (res?.error) {
+        setError("Invalid email or password. Please try again.");
+        setLoading(false);
+      } else {
+        window.location.href = "/dashboard";
+      }
     } catch (err) {
       setError("Authentication failed. Please check your credentials.");
       setLoading(false);
@@ -48,12 +54,19 @@ export default function LoginPage() {
     try {
       setLoading(true);
       setError(null);
-      await signIn("credentials", {
+      const isDev = roleEmail.includes("developer");
+      const res = await signIn("credentials", {
         email: roleEmail,
-        password: "demoPassword123",
-        callbackUrl: "/dashboard",
-        redirect: true,
+        password: isDev ? "devPassword123" : "adminPassword123",
+        redirect: false,
       });
+
+      if (res?.error) {
+        setError("Demo login failed.");
+        setLoading(false);
+      } else {
+        window.location.href = "/dashboard";
+      }
     } catch (err) {
       setError("Demo sign in failed. Please try again.");
       setLoading(false);
@@ -207,8 +220,21 @@ export default function LoginPage() {
             </button>
           </form>
 
+          {/* Signup Link */}
+          <div className="pt-2 border-t border-slate-100 text-center">
+            <p className="text-xs text-slate-600">
+              Don&apos;t have an enterprise account?{" "}
+              <Link
+                href="/signup"
+                className="font-bold text-slate-900 hover:underline"
+              >
+                Sign Up
+              </Link>
+            </p>
+          </div>
+
           {/* Security badge footer */}
-          <div className="pt-2 border-t border-slate-100 flex items-center justify-center gap-2 text-[11px] text-slate-500">
+          <div className="pt-1 flex items-center justify-center gap-2 text-[11px] text-slate-500">
             <Lock className="w-3.5 h-3.5 text-lime-600" />
             <span>Encrypted OAuth 2.0 &amp; JWT Session Handling</span>
           </div>
