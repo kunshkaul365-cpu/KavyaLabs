@@ -133,7 +133,8 @@ export default function DashboardPage() {
       const res = await fetch("/api/tasks");
       if (res.ok) {
         const data = await res.json();
-        setTasks(data.tasks || []);
+        const taskList = Array.isArray(data) ? data : (data.tasks || []);
+        setTasks(taskList);
       }
     } catch (err) {
       console.error("Failed to fetch tasks:", err);
